@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS eligibility_rules (
     gender TEXT,
     state TEXT,
     occupation TEXT,
-    student INTEGER DEFAULT 0,
-    farmer INTEGER DEFAULT 0,
-    disability INTEGER DEFAULT 0,
+    student INTEGER,
+    farmer INTEGER,
+    disability INTEGER,
     FOREIGN KEY (scheme_id) REFERENCES schemes(id)
 );
