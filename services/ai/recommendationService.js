@@ -8,33 +8,38 @@ const ai = new GoogleGenAI({
 
 async function explainSchemes(userProfile, schemes) {
   const prompt = `
-You are SahayakAI.
+    You are SahayakAI.
 
-Your job is to explain government schemes in simple English.
+    Your job is to explain government schemes in simple English.
 
-User Profile:
-${JSON.stringify(userProfile, null, 2)}
+    User Profile:
+    ${JSON.stringify(userProfile, null, 2)}
 
-Eligible Schemes:
-${JSON.stringify(schemes, null, 2)}
+    Eligible Schemes:
+    ${JSON.stringify(schemes, null, 2)}
 
-For every scheme return:
+    For every eligible scheme provide:
 
-Scheme Name
+    ## Scheme Name
 
-Why Eligible
+    Why Eligible
 
-Benefits
+    Benefits
 
-Required Documents
+    Required Documents
 
-Official Website
+    Official Website
 
-Application Steps
+    Application Steps
 
-Important Notes
+    Important Notes
 
-Return neat Markdown.
+    Instructions:
+    - Format the response using clean Markdown.
+    - Use headings, bullet lists, and numbered lists where appropriate.
+    - Keep the language simple and easy to understand.
+    - Do not include unnecessary introductions or conclusions.
+    - Ensure the information is well-structured and readable.
 `;
 
   const response = await ai.models.generateContent({

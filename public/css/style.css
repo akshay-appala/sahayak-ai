@@ -5,3 +5,7 @@ body {
 .hero {
   margin-top: 50px;
 }
+
+#aiRecommendation {
+  white-space: pre-wrap;
+}

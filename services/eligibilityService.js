@@ -73,9 +73,21 @@ async function checkEligibility(req, res) {
           aiRecommendation,
         });
       } catch (error) {
-        res.status(500).json({
-          success: false,
-          message: error.message,
+        console.log("Gemini API unavailable. Using fallback recommendation.");
+
+        res.json({
+          success: true,
+          totalSchemes: rows.length,
+          schemes: rows,
+          aiRecommendation: `
+              # AI Recommendation
+
+              AI recommendations are temporarily unavailable.
+
+              Based on your profile, the schemes listed above match your eligibility.
+
+              Please review their benefits, required documents, and official application links.
+            `,
         });
       }
     },
