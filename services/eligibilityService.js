@@ -1,9 +1,9 @@
 const db = require("../config/database");
 const { explainSchemes } = require("./ai/recommendationService");
 
-async function checkEligibility(req, res) {
+async function getEligibleSchemes(userProfile) {
   let { age, income, gender, state, occupation, student, farmer, disability } =
-    req.body;
+    userProfile;
 
   age = Number(age);
   income = Number(income);
@@ -33,65 +33,82 @@ async function checkEligibility(req, res) {
       AND (e.disability IS NULL OR e.disability = ?);
   `;
 
-  db.all(
-    sql,
-    [age, age, income, gender, state, occupation, student, farmer, disability],
-    async (err, rows) => {
-      if (err) {
-        return res.status(500).json({
-          success: false,
-          message: err.message,
-        });
-      }
-
-      rows.forEach((scheme) => {
-        try {
-          scheme.required_documents = JSON.parse(scheme.required_documents);
-        } catch {
-          scheme.required_documents = [];
+  return new Promise((resolve, reject) => {
+    db.all(
+      sql,
+      [
+        age,
+        age,
+        income,
+        gender,
+        state,
+        occupation,
+        student,
+        farmer,
+        disability,
+      ],
+      (err, rows) => {
+        if (err) {
+          return reject(err);
         }
+
+        rows.forEach((scheme) => {
+          try {
+            scheme.required_documents = JSON.parse(scheme.required_documents);
+          } catch {
+            scheme.required_documents = [];
+          }
+        });
+
+        resolve(rows);
+      },
+    );
+  });
+}
+
+async function checkEligibility(req, res) {
+  try {
+    const rows = await getEligibleSchemes(req.body);
+
+    if (rows.length === 0) {
+      return res.json({
+        success: true,
+        totalSchemes: 0,
+        schemes: [],
+        aiRecommendation:
+          "No eligible government schemes were found for the given profile.",
       });
+    }
 
-      // Don't call Gemini if no schemes are found
-      if (rows.length === 0) {
-        return res.json({
-          success: true,
-          totalSchemes: 0,
-          schemes: [],
-          aiRecommendation:
-            "No eligible government schemes were found for the given profile.",
-        });
-      }
+    try {
+      const aiRecommendation = await explainSchemes(req.body, rows);
 
-      try {
-        const aiRecommendation = await explainSchemes(req.body, rows);
+      res.json({
+        success: true,
+        totalSchemes: rows.length,
+        schemes: rows,
+        aiRecommendation,
+      });
+    } catch {
+      res.json({
+        success: true,
+        totalSchemes: rows.length,
+        schemes: rows,
+        aiRecommendation: `
+          AI recommendations are temporarily unavailable.
 
-        res.json({
-          success: true,
-          totalSchemes: rows.length,
-          schemes: rows,
-          aiRecommendation,
-        });
-      } catch (error) {
-        console.log("Gemini API unavailable. Using fallback recommendation.");
+          Based on your profile, the schemes listed above match your eligibility.
 
-        res.json({
-          success: true,
-          totalSchemes: rows.length,
-          schemes: rows,
-          aiRecommendation: `
-              # AI Recommendation
-
-              AI recommendations are temporarily unavailable.
-
-              Based on your profile, the schemes listed above match your eligibility.
-
-              Please review their benefits, required documents, and official application links.
-            `,
-        });
-      }
-    },
-  );
+          Please review their benefits, required documents, and official application links.
+        `,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 function getAllSchemes(req, res) {

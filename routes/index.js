@@ -2,7 +2,10 @@ const express = require("express");
 
 const router = express.Router();
 
-const eligibilityService = require("../services/eligibilityService");
+const {
+  checkEligibility,
+  getAllSchemes,
+} = require("../services/eligibilityService");
 
 router.get("/health", (req, res) => {
   res.json({
@@ -11,8 +14,7 @@ router.get("/health", (req, res) => {
   });
 });
 
-router.get("/schemes", eligibilityService.getAllSchemes);
-
-router.post("/eligibility", eligibilityService.checkEligibility);
+router.post("/eligibility", checkEligibility);
+router.get("/schemes", getAllSchemes);
 
 module.exports = router;
