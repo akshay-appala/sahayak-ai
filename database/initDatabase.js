@@ -9,5 +9,7 @@ db.exec(schema, (err) => {
     console.error("Schema Error:", err.message);
   } else {
     console.log("Database tables created.");
+
+    require("./seedDatabase");
   }
 });

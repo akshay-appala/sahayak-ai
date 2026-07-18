@@ -4,7 +4,7 @@ const path = require("path");
 const routes = require("./routes");
 require("./config/database");
 require("./database/initDatabase.js");
-//require("./database/seedDatabase");
+
 const app = express();
 
 app.use(express.json());
@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", routes);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
