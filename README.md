@@ -4,6 +4,23 @@ SahayakAI is an AI-powered Government Scheme Finder that helps users discover go
 
 ---
 
+## 🌐 Live Demo
+
+**Deployed Application:** https://sahayak-ai-swho.onrender.com
+
+---
+
+## 🤖 How AI Works
+
+1. The user enters personal details such as age, income, occupation, state, and other eligibility information.
+2. The backend validates the user input.
+3. SQLite filters government schemes using predefined eligibility rules to identify all eligible schemes.
+4. The eligible schemes are sent to **Google Gemini AI**.
+5. Gemini AI generates personalized explanations, including scheme benefits, eligibility reasons, required documents, and official application links.
+6. Users can download the personalized recommendations as a **PDF report** for future reference.
+
+---
+
 ## ✨ Features
 
 - Check eligibility for government schemes
